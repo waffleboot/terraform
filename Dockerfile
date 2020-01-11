@@ -23,18 +23,6 @@ RUN ln -s terraform_${VER} terraform
 
 WORKDIR /aws
 
-COPY example.tf /aws
-
 ENV PATH "/terraform:${PATH}"
-
-RUN terraform version
-
-RUN terraform fmt
-
-RUN terraform validate
-
-RUN terraform init
-
-#RUN terraform plan
 
 ENTRYPOINT [ "terraform" ]

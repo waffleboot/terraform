@@ -3,11 +3,14 @@
 
 provider "aws" {
   profile = "default"
-  region  = "eu-north-1"
+  region  = var.region
 }
 
 resource "aws_instance" "example" {
   ami           = "ami-0662eb9b9b8685935"
   instance_type = "t3.micro"
+  provisioner "local-exec" {
+    command = "echo ${aws_instance.example.public_ip} > ip_address.txt"
+  }
 }
 
