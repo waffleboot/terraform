@@ -21,6 +21,6 @@ RUN ln -s terraform_${VER} terraform
 
 RUN rm terraform_${VER}_SHA256SUMS terraform_${VER}_SHA256SUMS.sig terraform_${VER}_linux_amd64.zip
 
-WORKDIR terraform
+WORKDIR /terraform
 
 CMD [ "./terraform" ]
