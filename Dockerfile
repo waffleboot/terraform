@@ -17,10 +17,24 @@ RUN gpg --verify terraform_${VER}_SHA256SUMS.sig terraform_${VER}_SHA256SUMS ; \
 
 RUN unzip terraform_${VER}_linux_amd64.zip -d terraform_${VER}
 
-RUN ln -s terraform_${VER} terraform
-
 RUN rm terraform_${VER}_SHA256SUMS terraform_${VER}_SHA256SUMS.sig terraform_${VER}_linux_amd64.zip
 
-WORKDIR /terraform
+RUN ln -s terraform_${VER} terraform
 
-CMD [ "./terraform" ]
+WORKDIR /aws
+
+COPY example.tf /aws
+
+ENV PATH "/terraform:${PATH}"
+
+RUN terraform version
+
+RUN terraform fmt
+
+RUN terraform validate
+
+RUN terraform init
+
+#RUN terraform plan
+
+ENTRYPOINT [ "terraform" ]
