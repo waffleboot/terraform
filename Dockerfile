@@ -2,27 +2,27 @@ FROM ubuntu
 
 ARG VER=0.12.19
 
+WORKDIR /tmp/terraform
+
 COPY hashicorp.asc .
 
 RUN apt-get update && apt-get install -y gpg curl unzip
 
-RUN gpg --import hashicorp.asc && rm hashicorp.asc
+RUN gpg --import hashicorp.asc
 
-RUN curl -Os https://releases.hashicorp.com/terraform/0.12.19/terraform_${VER}_SHA256SUMS ; \
-    curl -Os https://releases.hashicorp.com/terraform/0.12.19/terraform_${VER}_SHA256SUMS.sig ; \
-    curl -Os https://releases.hashicorp.com/terraform/0.12.19/terraform_${VER}_linux_amd64.zip
+RUN curl -Os https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_SHA256SUMS ; \
+    curl -Os https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_SHA256SUMS.sig ; \
+    curl -Os https://releases.hashicorp.com/terraform/${VER}/terraform_${VER}_linux_amd64.zip
 
 RUN gpg --verify terraform_${VER}_SHA256SUMS.sig terraform_${VER}_SHA256SUMS ; \
     sha256sum --check --quiet --ignore-missing terraform_${VER}_SHA256SUMS
 
-RUN unzip terraform_${VER}_linux_amd64.zip -d terraform_${VER}
+RUN unzip terraform_${VER}_linux_amd64.zip -d /usr/local/bin/ && rm -r /tmp/terraform
 
-RUN rm terraform_${VER}_SHA256SUMS terraform_${VER}_SHA256SUMS.sig terraform_${VER}_linux_amd64.zip
+RUN apt-get install -y ansible
 
-RUN ln -s terraform_${VER} terraform
+WORKDIR /opt
 
-WORKDIR /aws
+RUN useradd terraform && mkdir /home/terraform && chown terraform:terraform /home/terraform
 
-ENV PATH "/terraform:${PATH}"
-
-ENTRYPOINT [ "terraform" ]
+USER terraform
