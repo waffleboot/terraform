@@ -142,3 +142,8 @@ resource "aws_network_interface" "private" {
     Name = "test"
   }
 }
+
+output "instance_ip_addr" {
+  value = aws_instance.front.public_dns
+}
+
