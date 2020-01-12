@@ -70,31 +70,29 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
-resource "aws_security_group" "allow_ssh" {
+resource "aws_security_group" "public" {
   vpc_id = aws_vpc.test.id
-  name   = "allow_ssh"
+  name   = "public"
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
   }
-  tags = {
-    Name = "allow_ssh"
-  }
-}
-
-resource "aws_security_group" "allow_http" {
-  vpc_id = aws_vpc.test.id
-  name   = "allow_http"
   ingress {
     cidr_blocks = ["0.0.0.0/0"]
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
   }
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "tcp"
+    from_port   = 2222
+    to_port     = 2222
+  }
   tags = {
-    Name = "allow_http"
+    Name = "public"
   }
 }
 
@@ -113,19 +111,23 @@ resource "aws_instance" "front" {
   ami                    = "ami-1dab2163"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public.id
-  vpc_security_group_ids = concat([aws_security_group.allow_ssh.id, aws_security_group.allow_http.id], data.aws_security_groups.default.ids)
+  vpc_security_group_ids = concat([aws_security_group.public.id], data.aws_security_groups.default.ids)
   key_name               = "ssh-key"
   tags = {
     Name = "front"
   }
+  # provisioner "file" {
+  #   source      = "~/.aws/master-to-worker.pem"
+  #   destination = "~/.ssh/master-to-worker.pem"
+  # }
 }
 
 resource "aws_instance" "back" {
-  ami                    = "ami-0662eb9b9b8685935"
+  ami                    = "ami-1dab2163"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.private.id
   vpc_security_group_ids = data.aws_security_groups.default.ids
-  key_name               = "ssh-key"
+  key_name               = "master-to-worker"
   tags = {
     Name = "back"
   }

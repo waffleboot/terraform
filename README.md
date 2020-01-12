@@ -7,9 +7,9 @@ docker run --rm --name terraform -it -v ${PWD}:/opt -v ~/.aws:/home/terraform/.a
 
 ---
 
-ssh -L 8888:192.168.0.103:22 -i ssh-key.pem ec2-user@ec2-13-53-152-109.eu-north-1.compute.amazonaws.com
+ssh -L 8888:192.168.0.107:22 -i ~/.aws/ssh-key.pem ubuntu@ec2-13-48-84-139.eu-north-1.compute.amazonaws.com
 
-ssh -i ssh-key.pem -p 8888 ec2-user@localhost
+ssh -i ~/.aws/ssh-key.pem -p 8888 ubuntu@localhost
 
 terraform fmt
 terraform apply
