@@ -84,6 +84,20 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
+resource "aws_security_group" "allow_http" {
+  vpc_id = aws_vpc.test.id
+  name   = "allow_http"
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+  }
+  tags = {
+    Name = "allow_http"
+  }
+}
+
 data "aws_security_groups" "default" {
   filter {
     name   = "vpc-id"
@@ -96,10 +110,10 @@ data "aws_security_groups" "default" {
 }
 
 resource "aws_instance" "front" {
-  ami                    = "ami-0662eb9b9b8685935"
+  ami                    = "ami-1dab2163"
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public.id
-  vpc_security_group_ids = concat([aws_security_group.allow_ssh.id], data.aws_security_groups.default.ids)
+  vpc_security_group_ids = concat([aws_security_group.allow_ssh.id, aws_security_group.allow_http.id], data.aws_security_groups.default.ids)
   key_name               = "ssh-key"
   tags = {
     Name = "front"
